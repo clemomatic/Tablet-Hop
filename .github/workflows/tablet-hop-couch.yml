@@ -1,0 +1,41 @@
+name: Tablet-Hop Couch Mode CI
+
+on:
+  push:
+    branches: [feature/couch-mode]
+  pull_request:
+    branches: [feature/couch-mode]
+  workflow_dispatch:
+
+concurrency:
+  group: tablet-hop-couch-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Unit tests for Couch Mode
+        run: npm test -- --runInBand --coverage=false tests/client/couch-actions.test.js
+      - name: Start VirtualTabletop
+        run: |
+          npm start > /tmp/tablet-hop-server.log 2>&1 &
+          for i in $(seq 1 120); do
+            if curl -fsSL http://127.0.0.1:8272/ -o /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/tablet-hop-server.log
+          exit 1
+      - name: Browser smoke tests
+        run: npx testcafe chrome:headless tests/testcafe/couch-mode.js
