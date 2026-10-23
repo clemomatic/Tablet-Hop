@@ -43,6 +43,7 @@ function couchUpdateUI() {
   const status = document.getElementById('couch-hand-status');
   if(title) title.textContent = hand ? 'Ma main' : 'Aucune place sélectionnée';
   if(status) status.textContent = hand ? couchHandCards().length + ' cartes' : 'Choisis une place sur le plateau';
+  if(typeof couchScheduleHandRender === 'function') couchScheduleHandRender();
   for(const button of document.querySelectorAll('[data-couch-view]')) {
     const active = button.dataset.couchView === couchView;
     button.classList.toggle('active', active);
