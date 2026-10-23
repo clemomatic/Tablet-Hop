@@ -3,6 +3,7 @@ const couchMode = new URLSearchParams(location.search).get('couch');
 const couchEnabled = couchMode === 'tv' || couchMode === 'phone';
 let couchView = 'board';
 let couchRefreshQueued = false;
+let couchHasChosenView = false;
 
 function couchMyHand() {
   for(const seat of widgetFilter(w => w.get('type') === 'seat' && w.get('player') === playerName)) {
@@ -35,51 +36,13 @@ function couchMaskTVHands() {
   }
 }
 
-function couchFocusOnHand(hand) {
-  // Keep the original card elements and event handlers. A shared hand can be
-  // much wider than the player's own cards, so frame the cards where possible.
-  const myCards = widgetFilter(w => {
-    if(w.get('type') !== 'card') return false;
-    const owner = w.get('owner');
-    if(owner && owner !== playerName && !(Array.isArray(owner) && owner.includes(playerName))) return false;
-    return w.get('parent') === hand.id || w.isDescendantOf(hand);
-  });
-
-  function contentBounds() {
-    const elements = myCards.length ? myCards.map(card => card.domElement) : [hand.domElement];
-    const rects = elements.filter(el => el && el.isConnected)
-      .map(el => el.getBoundingClientRect()).filter(r => r.width > 0 && r.height > 0);
-    if(!rects.length) return null;
-    const left = Math.min(...rects.map(r => r.left));
-    const top = Math.min(...rects.map(r => r.top));
-    const right = Math.max(...rects.map(r => r.right));
-    const bottom = Math.max(...rects.map(r => r.bottom));
-    return {left, top, width:right-left, height:bottom-top};
-  }
-
-  setZoomLevel(1);
-  setPan(0, 0);
-  const area = document.getElementById('roomArea').getBoundingClientRect();
-  const before = contentBounds();
-  if(!before) return;
-  const zoom = Math.max(1, Math.min(8, Math.min(
-    area.width * .86 / before.width,
-    Math.max(120, area.height - 120) * .72 / before.height
-  )));
-  setZoomLevel(zoom);
-  const framed = contentBounds();
-  if(!framed) return;
-  setPan(area.left + area.width / 2 - framed.left - framed.width / 2,
-    area.top + Math.max(20, area.height - 115) / 2 - framed.top - framed.height / 2);
-}
-
 function couchUpdateUI() {
   if(couchMode !== 'phone') return;
   const hand = couchMyHand();
   const title = document.getElementById('couch-hand-title');
   const status = document.getElementById('couch-hand-status');
   if(title) title.textContent = hand ? 'Ma main' : 'Aucune place sélectionnée';
-  if(status) status.textContent = hand ? couchCountCards(hand) + ' cartes' : 'Choisis une place sur le plateau';
+  if(status) status.textContent = hand ? couchHandCards().length + ' cartes' : 'Choisis une place sur le plateau';
   for(const button of document.querySelectorAll('[data-couch-view]')) {
     const active = button.dataset.couchView === couchView;
     button.classList.toggle('active', active);
@@ -88,6 +51,7 @@ function couchUpdateUI() {
 }
 
 function couchShowBoard() {
+  couchHasChosenView = true;
   couchView = 'board';
   setZoomLevel(1);
   setPan(0, 0);
@@ -102,15 +66,24 @@ function couchShowHand() {
     couchShowBoard();
     return;
   }
+  couchHasChosenView = true;
   couchView = 'hand';
-  couchFocusOnHand(hand);
+  // The new hand screen displays replicas of rendered faces, not a zoomed board.
+  setZoomLevel(1);
+  setPan(0, 0);
   couchUpdateUI();
+  couchScheduleHandRender();
 }
 
 function couchRefresh() {
   couchRefreshQueued = false;
   if(couchMode === 'tv') couchMaskTVHands();
-  if(couchMode === 'phone') couchUpdateUI();
+  if(couchMode === 'phone') {
+    // After the player occupies a seat, open their hand automatically once.
+    if(!couchHasChosenView && couchMyHand()) couchShowHand();
+    couchUpdateUI();
+    couchScheduleHandRender();
+  }
 }
 
 function couchScheduleRefresh() {
