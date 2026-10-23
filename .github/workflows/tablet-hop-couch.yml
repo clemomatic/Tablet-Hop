@@ -38,4 +38,4 @@ jobs:
           cat /tmp/tablet-hop-server.log
           exit 1
       - name: Browser smoke tests
-        run: npx testcafe chrome:headless tests/testcafe/couch-mode.js
+        run: npx testcafe chrome:headless tests/testcafe/couch-mode.js tests/testcafe/couch-hand.js
