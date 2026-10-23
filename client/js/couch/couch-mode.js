@@ -102,6 +102,8 @@ function couchInstall() {
   if(!couchEnabled) return;
   document.body.dataset.couchMode = couchMode;
   document.documentElement.style.setProperty('--toolbarSize', '0px');
+  // Recompute the board viewport after removing the original toolbar.
+  setScale();
 
   const bar = document.createElement('aside');
   bar.id = 'couch-ui';
