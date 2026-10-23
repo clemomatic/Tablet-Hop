@@ -59,6 +59,11 @@ function couchInstallProfile() {
     panel.hidden = typeof force === 'boolean' ? !force : !panel.hidden;
     playerButton.setAttribute('aria-expanded', String(!panel.hidden));
     if(!panel.hidden) {
+      // Keep the phone footer compact: identity and card actions never expand together.
+      if(couchView === 'actions') {
+        couchView = 'board';
+        couchUpdateUI();
+      }
       input.value = playerName;
       link.value = couchJoinURL();
     }
