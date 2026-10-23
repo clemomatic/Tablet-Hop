@@ -36,20 +36,41 @@ function couchMaskTVHands() {
 }
 
 function couchFocusOnHand(hand) {
-  // Retain the actual widget DOM and its native drag/touch event handlers.
+  // Keep the original card elements and event handlers. A shared hand can be
+  // much wider than the player's own cards, so frame the cards where possible.
+  const myCards = widgetFilter(w => {
+    if(w.get('type') !== 'card') return false;
+    const owner = w.get('owner');
+    if(owner && owner !== playerName && !(Array.isArray(owner) && owner.includes(playerName))) return false;
+    return w.get('parent') === hand.id || w.isDescendantOf(hand);
+  });
+
+  function contentBounds() {
+    const elements = myCards.length ? myCards.map(card => card.domElement) : [hand.domElement];
+    const rects = elements.filter(el => el && el.isConnected)
+      .map(el => el.getBoundingClientRect()).filter(r => r.width > 0 && r.height > 0);
+    if(!rects.length) return null;
+    const left = Math.min(...rects.map(r => r.left));
+    const top = Math.min(...rects.map(r => r.top));
+    const right = Math.max(...rects.map(r => r.right));
+    const bottom = Math.max(...rects.map(r => r.bottom));
+    return {left, top, width:right-left, height:bottom-top};
+  }
+
   setZoomLevel(1);
   setPan(0, 0);
   const area = document.getElementById('roomArea').getBoundingClientRect();
-  const before = hand.domElement.getBoundingClientRect();
-  if(before.width < 1 || before.height < 1) return;
+  const before = contentBounds();
+  if(!before) return;
   const zoom = Math.max(1, Math.min(8, Math.min(
     area.width * .86 / before.width,
     Math.max(120, area.height - 120) * .72 / before.height
   )));
   setZoomLevel(zoom);
-  const after = hand.domElement.getBoundingClientRect();
-  setPan(area.left + area.width / 2 - after.left - after.width / 2,
-    area.top + Math.max(20, area.height - 115) / 2 - after.top - after.height / 2);
+  const framed = contentBounds();
+  if(!framed) return;
+  setPan(area.left + area.width / 2 - framed.left - framed.width / 2,
+    area.top + Math.max(20, area.height - 115) / 2 - framed.top - framed.height / 2);
 }
 
 function couchUpdateUI() {
