@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101b26">
+  <meta name="description" content="Tablet-Hop : le plateau sur la TV, les cartes dans vos mains. Jouez ensemble, dans le même salon.">
+  <title>Tablet-Hop — Le jeu prend place dans votre salon</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f5f3ee;background:#0d1821;font-synthesis:none}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse 780px 500px at 78% 23%,rgba(48,103,115,.20),transparent 70%),radial-gradient(ellipse 550px 470px at 15% 3%,rgba(164,112,68,.13),transparent 73%),#0d1821}
+    a{color:inherit;text-decoration:none}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #f0d09a;outline-offset:3px}
+    .container{width:min(1150px,calc(100% - 44px));margin-inline:auto}
+    header{height:100px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .logo{display:flex;align-items:center;gap:14px;font-size:19px;font-weight:900;letter-spacing:.16em;white-space:nowrap}
+    .logo strong{color:#ebc98f}
+    .mark{width:45px;height:45px;border:1px solid rgba(238,203,144,.55);border-radius:14px;display:grid;place-items:center;position:relative;transform:rotate(-8deg);background:linear-gradient(150deg,#3a6461,#162633);box-shadow:0 10px 40px #02090d44}
+    .mark:before,.mark:after{content:"";position:absolute;border:2px solid #f4d39e;width:16px;height:22px;border-radius:4px;transform:rotate(-12deg) translateX(-5px)}
+    .mark:after{transform:rotate(14deg) translateX(6px);background:#315459}
+    .toplink{font-size:13px;color:#d1d8d6;border:1px solid #ffffff25;border-radius:999px;padding:10px 16px;transition:background .2s}
+    .toplink:hover{background:#ffffff10}
+    .hero{display:grid;grid-template-columns:1.04fr .96fr;gap:54px;align-items:center;padding:62px 0 68px}
+    .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#edc992;font-weight:800;margin:0 0 23px;display:flex;align-items:center;gap:11px}
+    .eyebrow:before{content:"";width:30px;height:1px;background:#edc992}
+    h1{font-size:clamp(45px,5.5vw,79px);line-height:1.05;letter-spacing:-.055em;font-weight:800;margin:0}
+    h1 em{font-style:normal;color:#e5bc81}
+    .intro{max-width:495px;font-size:18px;line-height:1.75;color:#b8c9cd;margin:25px 0 32px}
+    .primary{display:inline-flex;align-items:center;justify-content:center;gap:11px;border:0;border-radius:15px;padding:18px 24px;color:#172532;background:#eac48a;font-weight:800;font-size:15px;box-shadow:0 12px 40px #cfa66b25;transition:transform .2s,background .2s}
+    .primary:hover{transform:translateY(-2px);background:#f2d39e}
+    .arrow{font-size:22px;line-height:12px}
+    .subtle{color:#94aaad;font-size:13px;margin:18px 0 0}
+    .art{min-height:440px;position:relative;display:grid;place-items:center;isolation:isolate}
+    .art:before{content:"";position:absolute;width:90%;height:90%;border-radius:50%;border:1px solid #ffffff18;box-shadow:0 0 0 35px #ffffff04,0 0 0 84px #ffffff03;z-index:-1}
+    .board{width:min(100%,510px);aspect-ratio:1.25;background:linear-gradient(155deg,#345b51,#193b39 70%);border:12px solid #8a6750;border-bottom-width:20px;border-radius:27px;box-shadow:0 45px 90px #030b119c,inset 0 0 0 3px #ecbe8159,0 1px 0 2px #ca9c6d;transform:rotate(-8deg);position:relative;overflow:hidden}
+    .board:before{content:"";position:absolute;inset:22px;border:1px solid #ffffff1f;border-radius:10px}
+    .token{position:absolute;display:grid;place-items:center;border-radius:50%;font-size:23px;font-weight:800;box-shadow:0 6px 12px #030b1255}
+    .t1{left:18%;top:25%;width:58px;height:58px;color:#193b37;background:linear-gradient(140deg,#f4d89c,#be975d)}
+    .t2{right:17%;top:28%;width:43px;height:43px;background:linear-gradient(140deg,#a9dfe3,#4e878b);color:#174245}
+    .t3{left:40%;bottom:24%;width:34px;height:34px;background:linear-gradient(140deg,#f0a597,#b45149);color:#702f29}
+    .board-card{position:absolute;width:84px;height:123px;border-radius:10px;background:#f7edde;box-shadow:0 9px 14px #07211e5c;display:flex;align-items:center;justify-content:center;font-size:38px;color:#b45952;border:4px solid #fdf6e8}
+    .bc1{top:27%;left:35%;transform:rotate(8deg)}.bc2{top:29%;left:49%;transform:rotate(-3deg);color:#335d61}
+    .phone{position:absolute;bottom:-26px;right:0;width:163px;height:252px;background:#0c121a;border:7px solid #293942;border-radius:27px;transform:rotate(11deg);box-shadow:0 18px 50px #030a10a9;display:flex;flex-direction:column;align-items:center;padding:20px 10px 10px;gap:9px}
+    .phone:before{content:"";width:48px;height:6px;border-radius:4px;background:#3d5056;position:absolute;top:7px;left:50%;transform:translateX(-50%)}
+    .phone-title{font-size:9px;color:#efd0a1;font-weight:800;letter-spacing:.12em}.phone-text{font-size:9px;color:#d4dfdf}
+    .hand{display:flex;position:relative;width:100%;height:115px;align-items:flex-end;justify-content:center}
+    .mini{width:54px;height:86px;position:absolute;border-radius:6px;background:#f4eadb;border:2px solid #fff9ef;display:grid;place-items:center;font-size:28px;color:#b15751;box-shadow:0 7px 14px #0008;bottom:5px}
+    .mini:nth-child(1){transform:translateX(-35px) rotate(-15deg);color:#315b63}.mini:nth-child(2){transform:translateY(-7px);z-index:2}.mini:nth-child(3){transform:translateX(35px) rotate(15deg);color:#315b63}
+    .phone-btn{font-size:10px;padding:9px;background:#dfbf89;color:#162632;border-radius:8px;font-weight:800;width:100%;text-align:center}
+    .join{padding:32px 36px 34px;background:linear-gradient(145deg,#1b2c37,#162630);border:1px solid #ffffff19;border-radius:24px;box-shadow:0 20px 75px #0002;margin-top:26px}
+    .join-top{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:20px}
+    h2{font-size:25px;margin:0;letter-spacing:-.03em}.step{font-size:12px;color:#9bacb5}
+    form{display:flex;gap:10px}input{background:#0c1a24;color:#f9f5ed;border:1px solid #ffffff38;border-radius:12px;padding:15px 17px;min-width:0;flex:1;font-size:16px}
+    input::placeholder{color:#8499a4}.neutral{border:1px solid #fff3;color:#f5e9d4;background:#334954;border-radius:12px;padding:15px 19px;font-weight:750}
+    .neutral:hover{background:#415c68}.help{font-size:12px;color:#9bb1b5;margin:13px 0 0}
+    .result{margin-top:23px;border-top:1px solid #ffffff24;padding-top:23px}
+    .result[hidden]{display:none}.room-label{font-size:12px;letter-spacing:.10em;text-transform:uppercase;color:#e9c38f;font-weight:800;margin:0 0 14px}
+    .options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .option{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:17px;border:1px solid #ffffff25;border-radius:15px;background:#ffffff08;transition:background .2s,transform .2s}
+    .option:hover{background:#ffffff13;transform:translateY(-2px)}
+    .option .sym{font-size:23px}.option strong{font-size:15px}.option small{font-size:12px;color:#acc1c7;line-height:1.45}
+    .copy{display:flex;gap:9px;align-items:center;margin-top:17px;color:#acbec6;flex-wrap:wrap;font-size:13px}
+    .copycode{padding:7px 11px;border-radius:8px;background:#0e1c26;color:#e8c38e;font-weight:800;user-select:all}
+    .copy button{font-size:12px;padding:7px 10px;border:1px solid #ffffff36;border-radius:8px;background:#ffffff0b;color:#e7f0f0}
+    .copy button:hover{background:#ffffff1e}
+    .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:42px 0 85px}
+    .feature{padding:23px 23px 19px;border:1px solid #ffffff12;border-radius:17px;background:#ffffff05}
+    .feature .sym{font-size:24px}.feature h3{font-size:16px;margin:15px 0 8px}.feature p{color:#9db2b7;line-height:1.6;font-size:13px;margin:0}
+    footer{border-top:1px solid #ffffff17;padding:26px 0 40px;color:#8198a1;font-size:12px;display:flex;justify-content:space-between;gap:12px}
+    footer a{text-decoration:underline;text-underline-offset:3px}
+    @media(max-width:860px){header{height:80px}.hero{grid-template-columns:1fr;padding-top:32px;gap:12px}.hero-copy{max-width:700px}.art{min-height:390px;width:min(510px,95%);margin:auto}.board{width:90%}.features{gap:12px}}
+    @media(max-width:560px){.container{width:min(100% - 30px,1150px)}.logo{gap:10px;font-size:15px}.mark{height:37px;width:37px}.toplink{font-size:11px;padding:8px 10px}h1{font-size:clamp(40px,11vw,58px)}.intro{font-size:15px}.hero{padding-top:20px;padding-bottom:25px}.art{min-height:285px}.board{width:80%;border-width:8px;border-bottom-width:14px;border-radius:17px}.board-card{width:57px;height:87px;font-size:26px;border-width:3px}.t1{width:40px;height:40px;font-size:18px}.t2{width:33px;height:33px}.t3{width:25px;height:25px}.phone{height:189px;width:121px;bottom:-2px;right:6px;border-width:5px;border-radius:20px;padding:15px 7px 8px}.phone:before{top:5px;width:34px;height:4px}.phone-title,.phone-text{font-size:7px}.hand{height:80px}.mini{width:39px;height:64px;font-size:19px}.mini:nth-child(1){transform:translateX(-27px) rotate(-15deg)}.mini:nth-child(3){transform:translateX(27px) rotate(15deg)}.phone-btn{font-size:8px;padding:7px}.join{padding:24px 18px;border-radius:20px;margin-top:18px}.join-top{display:block}.step{display:block;margin-top:5px}form{flex-direction:column}.options{grid-template-columns:1fr}.option{flex-direction:row;align-items:center;gap:15px}.option small{margin-left:auto;text-align:right;max-width:140px}.features{grid-template-columns:1fr;margin:28px 0 48px}.feature{padding:18px}footer{flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="logo" href="/" aria-label="Tablet-Hop, accueil"><span class="mark" aria-hidden="true"></span><span>TABLET<strong>HOP</strong></span></a>
+      <a class="toplink" href="#rejoindre">Rejoindre une partie ↗</a>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Vos jeux. Votre salon. Une nouvelle expérience.</p>
+          <h1 id="hero-title">Le plateau sur la <em>TV.</em><br>Les cartes dans vos <em>mains.</em></h1>
+          <p class="intro">Rassemblez vos amis autour d'un même écran. La table prend vie sur la télévision, chacun retrouve ses cartes sur son smartphone, et la partie peut commencer.</p>
+          <button class="primary" id="create-room" type="button">Créer une salle <span class="arrow" aria-hidden="true">↗</span></button>
+          <p class="subtle">Sans compte · Compatible avec les jeux VirtualTabletop</p>
+        </div>
+        <div class="art" aria-hidden="true">
+          <div class="board">
+            <div class="token t1">★</div><div class="token t2">◆</div><div class="token t3"></div>
+            <div class="board-card bc1">♥</div><div class="board-card bc2">♠</div>
+          </div>
+          <div class="phone"><div class="phone-title">MA MAIN</div><div class="phone-text">3 cartes</div><div class="hand"><div class="mini">♠</div><div class="mini">♥</div><div class="mini">♣</div></div><div class="phone-btn">JOUER UNE CARTE ↗</div></div>
+        </div>
+      </section>
+
+      <section id="rejoindre" class="join" aria-labelledby="join-title">
+        <div class="join-top"><h2 id="join-title">Retrouver une partie</h2><span class="step">01 / Choisissez votre salle</span></div>
+        <form id="join-form">
+          <input id="room-input" name="room" aria-label="Nom ou lien de votre salle" placeholder="Nom de la salle ou lien reçu" maxlength="240" autocapitalize="off" autocomplete="off" spellcheck="false" required>
+          <button type="submit" class="neutral">Continuer →</button>
+        </form>
+        <p class="help" id="join-help" role="status">Entre le code partagé par un ami, ou crée une nouvelle salle.</p>
+        <div class="result" id="room-result" hidden>
+          <p class="room-label" id="room-result-title">Salle prête</p>
+          <div class="options">
+            <a class="option" id="open-tv" href="#"><span class="sym" aria-hidden="true">▣</span><strong>Afficher sur la TV</strong><small>Plateau commun, plein écran</small></a>
+            <a class="option" id="open-phone" href="#"><span class="sym" aria-hidden="true">▤</span><strong>Jouer sur téléphone</strong><small>Votre main et vos actions</small></a>
+            <a class="option" id="open-classic" href="#"><span class="sym" aria-hidden="true">⚙</span><strong>Configurer le jeu</strong><small>Bibliothèque et éditeur classique</small></a>
+          </div>
+          <div class="copy"><span>Code de la salle :</span><span class="copycode" id="room-code"></span><button id="copy-room-link" type="button">Copier l'invitation</button><span id="copy-status" role="status"></span></div>
+        </div>
+      </section>
+
+      <section class="features" aria-label="Les avantages Tablet-Hop">
+        <div class="feature"><span class="sym" aria-hidden="true">▣</span><h3>Un plateau partagé</h3><p>La télévision devient votre table. Tout le monde voit les dés, les pions et l'évolution de la partie.</p></div>
+        <div class="feature"><span class="sym" aria-hidden="true">▤</span><h3>Une main personnelle</h3><p>Chaque joueur dispose d'un écran de commandes et peut retrouver ses cartes sur son téléphone.</p></div>
+        <div class="feature"><span class="sym" aria-hidden="true">✦</span><h3>Les jeux que vous aimez</h3><p>Un socle compatible VirtualTabletop, enrichi progressivement d'une interface pensée pour le salon.</p></div>
+      </section>
+    </main>
+    <footer><span>Tablet-Hop · Prototype Couch Mode</span><span>Basé sur <a href="https://github.com/ArnoldSmith86/virtualtabletop" rel="noreferrer">VirtualTabletop</a>, logiciel libre GPL-3.0 · <a href="https://github.com/clemomatic/Tablet-Hop" rel="noreferrer">Code source</a></span></footer>
+  </div>
+  <script>
+    (function(){
+      const input = document.getElementById('room-input');
+      const result = document.getElementById('room-result');
+      const help = document.getElementById('join-help');
+      const code = document.getElementById('room-code');
+      const title = document.getElementById('room-result-title');
+      const copyStatus = document.getElementById('copy-status');
+      let currentRoom = '';
+
+      function roomFromInput(text) {
+        let value = text.trim();
+        if(/^https?:\/\//i.test(value)) {
+          try {
+            const url = new URL(value);
+            value = url.pathname.split('/').filter(Boolean).pop() || '';
+          } catch(e) {return '';}
+        }
+        return /^[A-Za-z0-9_-]{1,64}$/.test(value) ? value : '';
+      }
+      function setRoom(name, isNew) {
+        currentRoom = name;
+        input.value = name;
+        title.textContent = isNew ? 'Votre nouvelle salle est prête' : 'Choisissez votre écran';
+        code.textContent = name;
+        const base = '/' + encodeURIComponent(name);
+        document.getElementById('open-tv').href = base + '?couch=tv';
+        document.getElementById('open-phone').href = base + '?couch=phone';
+        document.getElementById('open-classic').href = base;
+        result.hidden = false;
+        help.textContent = 'Choisissez comment vous souhaitez utiliser cette salle.';
+        copyStatus.textContent = '';
+        result.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+      document.getElementById('create-room').addEventListener('click',function(){
+        const values = new Uint8Array(5);
+        if(window.crypto && window.crypto.getRandomValues) {
+          window.crypto.getRandomValues(values);
+          setRoom('hop-' + Array.from(values, n => (n % 36).toString(36)).join(''), true);
+        } else {
+          setRoom('hop-' + Math.random().toString(36).slice(2,9), true);
+        }
+      });
+      document.getElementById('join-form').addEventListener('submit',function(e){
+        e.preventDefault();
+        const name = roomFromInput(input.value);
+        if(!name) {
+          help.textContent = 'Indique un code de salle simple (lettres, chiffres, - ou _), ou colle son lien complet.';
+          result.hidden = true;
+          return;
+        }
+        setRoom(name, false);
+      });
+      document.getElementById('copy-room-link').addEventListener('click',async function(){
+        if(!currentRoom)return;
+        const url = location.origin + '/' + encodeURIComponent(currentRoom) + '?couch=phone';
+        try {
+          await navigator.clipboard.writeText(url);
+          copyStatus.textContent = 'Lien copié ✓';
+        } catch(e){
+          copyStatus.textContent = 'Copie le lien : ' + url;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
