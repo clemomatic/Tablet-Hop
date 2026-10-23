@@ -250,3 +250,40 @@ body[data-couch-mode="phone"] select:focus-visible {
   body[data-couch-mode="phone"] .couch-hand-inner{padding-top:15px;}
 }
 @media(prefers-reduced-motion:reduce){body[data-couch-mode="phone"] .couch-hand-card{transition:none;}}
+
+
+/* Game-supplied controls. The original click routines execute on the actual VTT buttons. */
+body[data-couch-mode="phone"] .couch-hand-quick-panel[hidden] {display:none!important;}
+body[data-couch-mode="phone"] .couch-hand-quick-panel {
+  margin: 21px 20px 0;
+  padding: 15px 15px 17px;
+  border-radius: 18px;
+  border: 1px solid rgba(230,198,143,.21);
+  background: linear-gradient(140deg,rgba(52,77,80,.65),rgba(24,44,57,.82));
+}
+body[data-couch-mode="phone"] .couch-hand-quick-panel h2 {
+  margin: 0 0 13px;
+  font: 850 10px system-ui,sans-serif;
+  letter-spacing: .16em;
+  color: #eac58e;
+}
+body[data-couch-mode="phone"] .couch-hand-quick-buttons {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 9px;
+}
+body[data-couch-mode="phone"] .couch-hand-game-button {
+  min-height: 47px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.20);
+  color: #f1e9db;
+  background: rgba(255,255,255,.08);
+  font: 750 12px system-ui,sans-serif;
+  line-height: 1.25;
+  padding: 9px;
+  cursor: pointer;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body[data-couch-mode="phone"] .couch-hand-game-button:active {background:rgba(241,204,148,.23);}
+body[data-couch-mode="phone"] .couch-hand-game-button:disabled {opacity:.5;cursor:default;}
