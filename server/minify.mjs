@@ -125,7 +125,8 @@ const CLIENT_CSS = [
   'client/css/custom.css',
   'client/css/couch/couch-mode.css',
   'client/css/couch/couch-actions.css',
-  'client/css/couch/couch-profile.css'
+  'client/css/couch/couch-profile.css',
+  'client/css/couch/couch-hand.css'
 ];
 
 const CLIENT_JS = [
@@ -177,7 +178,8 @@ const CLIENT_JS = [
   'client/js/main.js',
   'client/js/couch/couch-mode.js',
   'client/js/couch/couch-actions.js',
-  'client/js/couch/couch-profile.js'
+  'client/js/couch/couch-profile.js',
+  'client/js/couch/couch-hand.js'
 ];
 
 const EDITOR_CSS = [
