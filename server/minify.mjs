@@ -123,7 +123,8 @@ const CLIENT_CSS = [
 
   'client/css/fonts.css',
   'client/css/custom.css',
-  'client/css/couch/couch-mode.css'
+  'client/css/couch/couch-mode.css',
+  'client/css/couch/couch-actions.css'
 ];
 
 const CLIENT_JS = [
@@ -173,7 +174,8 @@ const CLIENT_JS = [
   'client/js/widgets/timer.js',
 
   'client/js/main.js',
-  'client/js/couch/couch-mode.js'
+  'client/js/couch/couch-mode.js',
+  'client/js/couch/couch-actions.js'
 ];
 
 const EDITOR_CSS = [
