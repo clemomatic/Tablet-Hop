@@ -181,15 +181,22 @@ async function couchPlaySelectedCard() {
       card.movedByButton = true;
       await card.moveToHolder(target);
     } else {
-      await card.set('owner', null);
-      await card.set('parent', null);
-      const width = Number(card.get('width')) || 103;
-      const height = Number(card.get('height')) || 160;
-      await card.setPosition(
-        Math.round((viewportConfig.targetWidth - width) / 2),
-        Math.round((viewportConfig.targetHeight - height) / 2),
-        card.get('z')
-      );
+      // Detach before positioning. Without this guard, the old hand coordinates
+      // could momentarily create an unintended pile elsewhere on the board.
+      card.disablePileUpdateAfterParentChange = true;
+      try {
+        await card.set('owner', null);
+        await card.set('parent', null);
+        const width = Number(card.get('width')) || 103;
+        const height = Number(card.get('height')) || 160;
+        await card.setPosition(
+          Math.round((viewportConfig.targetWidth - width) / 2),
+          Math.round((viewportConfig.targetHeight - height) / 2),
+          card.get('z')
+        );
+      } finally {
+        delete card.disablePileUpdateAfterParentChange;
+      }
     }
     couchSelectedCardID = null;
     couchActionMessage('Carte posée sur le plateau.');
