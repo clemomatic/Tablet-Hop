@@ -11,8 +11,7 @@ function couchHandCards() {
   const hand = couchMyHand();
   if(!hand) return [];
   return widgetFilter(card => {
-    if(card.get('type') !== 'card' || card.get('movable') === false || card.get('fixedParent'))
-      return false;
+    if(card.get('type') !== 'card') return false;
     const owner = card.get('owner');
     if(card.domElement && card.domElement.classList.contains('foreign')) return false;
     if(owner && owner !== playerName && !(Array.isArray(owner) && owner.includes(playerName)))
@@ -26,7 +25,7 @@ function couchHandCards() {
 }
 
 function couchCardTitle(card, index) {
-  const candidate = card.get('text') || card.get('label') || card.get('cardType');
+  const candidate = card.get('title') || card.get('name') || card.get('text') || card.get('label') || card.get('cardType');
   return typeof candidate === 'string' && candidate.trim()
     ? candidate.trim().slice(0, 28)
     : 'Carte ' + (index + 1);
@@ -165,7 +164,7 @@ function couchRenderActions() {
     select.add(new Option(couchTargetLabel(target, index), target.id)));
   select.value = couchSelectedTargetID;
   select.disabled = couchActionPending;
-  play.disabled = couchActionPending;
+  play.disabled = couchActionPending || focus.get('movable') === false || !!focus.get('fixedParent');
   play.textContent = couchActionPending ? 'Déplacement…' : 'Poser la carte';
   couchActionMessage(couchActionNotice || (cards.length + (cards.length > 1 ? ' cartes disponibles' : ' carte disponible')));
 }
@@ -182,6 +181,10 @@ async function couchPlaySelectedCard() {
   if(!card) {
     couchActionMessage('Cette carte n’est plus dans ta main.');
     couchScheduleActionsRender();
+    return;
+  }
+  if(card.get('movable') === false || card.get('fixedParent')) {
+    couchActionMessage('Cette carte ne peut pas être déplacée librement. Utilise les actions du jeu.');
     return;
   }
   const target = couchSelectedTargetID === '__table__'
