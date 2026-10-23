@@ -14,6 +14,7 @@ function couchHandCards() {
     if(card.get('type') !== 'card' || card.get('movable') === false || card.get('fixedParent'))
       return false;
     const owner = card.get('owner');
+    if(card.domElement && card.domElement.classList.contains('foreign')) return false;
     if(owner && owner !== playerName && !(Array.isArray(owner) && owner.includes(playerName)))
       return false;
     return card.get('parent') === hand.id || card.isDescendantOf(hand);
@@ -31,25 +32,43 @@ function couchCardTitle(card, index) {
     : 'Carte ' + (index + 1);
 }
 
-function couchCardThumbnail(card) {
+// Reuse a VTT card's rendered face without moving the real widget.
+// A face shown as a card back by VTT must remain a back in Tablet-Hop.
+function couchCardThumbnail(card, options = {}) {
+  const large = !!options.large;
+  const width = Math.max(1, Number(card.get('width')) || 103);
+  const height = Math.max(1, Number(card.get('height')) || 160);
+  const maxWidth = large ? 172 : 70;
+  const maxHeight = large ? 238 : 94;
+  const ratio = Math.min(maxWidth / width, maxHeight / height);
   const wrapper = document.createElement('span');
-  wrapper.className = 'couch-card-thumbnail';
-  const face = card.domElement && card.domElement.querySelector('.active.cardFace');
-  if(face) {
-    const width = Math.max(1, Number(card.get('width')) || 103);
-    const height = Math.max(1, Number(card.get('height')) || 160);
-    const scale = Math.min(70 / width, 94 / height);
+  wrapper.className = 'couch-card-thumbnail' + (large ? ' couch-card-thumbnail-large' : '');
+  wrapper.style.width = Math.round(width * ratio) + 'px';
+  wrapper.style.height = Math.round(height * ratio) + 'px';
+  wrapper.setAttribute('aria-hidden', 'true');
+
+  const element = card.domElement;
+  const faces = element ? [...element.children].filter(child => child.classList.contains('cardFace')) : [];
+  const backVisible = !!(element && (element.classList.contains('showCardBack') ||
+    (element.parentElement && element.parentElement.classList.contains('showCardBack') &&
+     element.parentElement.classList.contains('holder'))));
+  const visibleFace = backVisible
+    ? faces.find(face => !face.classList.contains('active'))
+    : faces.find(face => face.classList.contains('active'));
+
+  if(visibleFace) {
     const shell = document.createElement('span');
     shell.className = 'card couch-card-snapshot';
     shell.style.width = width + 'px';
     shell.style.height = height + 'px';
-    shell.style.transform = 'scale(' + scale + ')';
+    shell.style.transform = 'scale(' + ratio + ')';
     shell.style.transformOrigin = 'top left';
-    shell.appendChild(face.cloneNode(true));
-    for(const element of shell.querySelectorAll('[id]')) element.removeAttribute('id');
-    for(const element of shell.querySelectorAll('[contenteditable]')) element.removeAttribute('contenteditable');
-    wrapper.style.width = width * scale + 'px';
-    wrapper.style.height = height * scale + 'px';
+    const face = visibleFace.cloneNode(true);
+    face.classList.add('active');
+    shell.appendChild(face);
+    for(const node of shell.querySelectorAll('[id]')) node.removeAttribute('id');
+    for(const node of shell.querySelectorAll('[contenteditable]')) node.removeAttribute('contenteditable');
+    for(const node of shell.querySelectorAll('[tabindex]')) node.removeAttribute('tabindex');
     wrapper.appendChild(shell);
   } else {
     wrapper.textContent = '🃏';
@@ -82,6 +101,7 @@ function couchActionMessage(text) {
   couchActionNotice = text;
   const el = document.getElementById('couch-action-message');
   if(el) el.textContent = text;
+  if(typeof couchScheduleHandRender === 'function') couchScheduleHandRender();
 }
 
 function couchRenderActions() {
@@ -129,6 +149,7 @@ function couchRenderActions() {
       couchActionNotice = '';
       couchSelectedCardID = card.id;
       couchScheduleActionsRender();
+      if(typeof couchScheduleHandRender === 'function') couchScheduleHandRender();
     });
     fragment.appendChild(button);
   });
@@ -208,6 +229,7 @@ async function couchPlaySelectedCard() {
     batchEnd();
     couchActionPending = false;
     couchScheduleActionsRender();
+    if(typeof couchScheduleHandRender === 'function') couchScheduleHandRender();
   }
 }
 
