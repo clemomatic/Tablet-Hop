@@ -109,10 +109,12 @@ function couchRenderHand() {
   targets.forEach((target, index) => targetSelect.add(new Option(couchTargetLabel(target, index), target.id)));
   targetSelect.value = couchSelectedTargetID;
   targetSelect.disabled = couchActionPending;
-  play.disabled = couchActionPending;
+  play.disabled = couchActionPending || selected.get('movable') === false || !!selected.get('fixedParent');
   play.textContent = couchActionPending ? 'Déplacement…' : 'Jouer cette carte';
   feedback.textContent = couchActionNotice ||
-    'Une action libre : certains jeux utilisent des règles ou boutons spécifiques.';
+    (play.disabled && !couchActionPending
+      ? 'Cette carte est verrouillée dans le jeu. Utilisez les commandes du plateau.'
+      : 'Action libre : certains jeux utilisent leurs propres règles et boutons.');
 }
 
 function couchInstallHand() {
@@ -159,6 +161,27 @@ function couchInstallHand() {
 
   stage.querySelector('#couch-hand-go-board').addEventListener('click', couchShowBoard);
   stage.querySelector('#couch-hand-play').addEventListener('click', couchPlaySelectedCard);
+
+  // Swiping the rail selects the card nearest its visual center once scrolling settles.
+  // No actual VTT object is dragged when swiping through the hand.
+  const rail = stage.querySelector('#couch-hand-cards');
+  let scrollTimer = null;
+  rail.addEventListener('scroll', () => {
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      if(couchView !== 'hand') return;
+      const box = rail.getBoundingClientRect();
+      const center = box.left + box.width / 2;
+      let closest = null, distance = Infinity;
+      for(const button of rail.querySelectorAll('[data-couch-card]')) {
+        const rect = button.getBoundingClientRect();
+        const d = Math.abs(rect.left + rect.width / 2 - center);
+        if(d < distance) { closest = button; distance = d; }
+      }
+      if(closest && closest.dataset.couchCard !== couchSelectedCardID)
+        couchChooseCard(closest.dataset.couchCard);
+    }, 135);
+  }, {passive:true});
   stage.querySelector('#couch-hand-target').addEventListener('change', e => {
     couchSelectedTargetID = e.target.value;
     couchActionNotice = '';
