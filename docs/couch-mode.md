@@ -72,3 +72,20 @@ Ces actions n'ont pas encore été validées sur tous les jeux de la bibliothèq
 ## Déploiement
 
 Un Blueprint Render pour la démonstration gratuite est fourni dans `render.yaml`. Voir aussi `docs/render.md`.
+
+
+## Sprint 1 — Main tactile (23 octobre 2026)
+
+Avec le lien `/NOM-DE-SALLE?couch=phone` :
+
+- Après avoir choisi une place liée à un holder `hand`, l'onglet **Ma main** s'ouvre automatiquement.
+- Cartes en format plus grand, carrousel horizontal tactile, flèches précédente/suivante, sélection et compteur.
+- Le carrousel reproduit le recto/verso effectivement rendu par VirtualTabletop : les cartes d'autres joueurs ne sont pas proposées et les objets natifs ne sont pas déplacés dans le DOM.
+- **Jouer cette carte** : destination « Au centre du plateau » ou zone compatible, en utilisant les vraies méthodes du moteur ; le raccourci n'invente aucune règle.
+- Les cartes non déplaçables peuvent être consultées mais pas déplacées librement.
+- **Commandes du jeu** : affichage des boutons VirtualTabletop visibles au joueur qui définissent une `clickRoutine`. Un bouton « Piocher » n'apparaît que si le jeu l'a prévu ; la routine du jeu est invoquée sans modification.
+- **Plateau** conserve la vue native lorsque les commandes spécifiques d'un jeu ne sont pas encore couvertes.
+
+Tests complémentaires : `tests/client/couch-game-buttons.test.js` et `tests/testcafe/couch-hand.js`, désormais inclus dans la CI du fork.
+
+**Limites du prototype :** interface à vérifier avec plusieurs jeux réels. Les raccourcis de carte peuvent contourner des règles propres au jeu si ses auteurs les ont implémentées uniquement via des boutons/scénarios. Il faudra ajouter progressivement des profils d'action déclaratifs et une suite de tests multijoueurs.
