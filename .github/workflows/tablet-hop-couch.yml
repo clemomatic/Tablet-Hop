@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Unit tests for Couch Mode
-        run: npm test -- --runInBand --coverage=false tests/client/couch-actions.test.js
+        run: npm test -- --runInBand --coverage=false tests/client/couch-actions.test.js tests/client/couch-game-buttons.test.js
       - name: Start VirtualTabletop
         run: |
           npm start > /tmp/tablet-hop-server.log 2>&1 &
