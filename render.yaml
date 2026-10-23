@@ -1,0 +1,24 @@
+# Tablet-Hop: first public demo on Render's free Node web service.
+# The app uses WebSockets and local files; local saves are EPHEMERAL on free instances.
+# Upgrade the service and attach a persistent disk at /opt/render/project/src/save
+# when permanent games/rooms/assets become necessary.
+services:
+  - type: web
+    name: tablet-hop
+    runtime: node
+    repo: https://github.com/clemomatic/Tablet-Hop
+    branch: feature/couch-mode
+    region: frankfurt
+    plan: free
+    buildCommand: npm ci && node server/prebuild.mjs
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeployTrigger: commit
+    envVars:
+      - key: VTT_SAVE_DIR
+        value: /opt/render/project/src/save
+      - key: EXTERNALURL
+        fromService:
+          type: web
+          name: tablet-hop
+          envVarKey: RENDER_EXTERNAL_URL
