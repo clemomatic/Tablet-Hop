@@ -2,6 +2,69 @@
 // The widgets always stay on the board; this screen never re-parents real DOM nodes.
 let couchHandRenderScheduled = false;
 
+// Show only meaningful game-authored Button widgets. Pressing one invokes its
+// existing clickRoutine; Tablet-Hop never guesses what "draw" or "roll" means.
+let couchGameButtonPending = false;
+
+function couchGameButtons() {
+  if(!couchMyHand()) return [];
+  return widgetFilter(w => {
+    if(w.get('type') !== 'button' || w.get('display') === false || w.get('clickable') === false)
+      return false;
+    if(!Array.isArray(w.get('clickRoutine'))) return false;
+    if(!w.domElement || w.domElement.classList.contains('foreign') ||
+       w.domElement.classList.contains('hidden')) return false;
+    return true;
+  }).slice(0, 12);
+}
+
+function couchGameButtonLabel(w) {
+  const label = w.get('text') || w.get('label') || w.get('name') || w.get('icon');
+  if(typeof label === 'string' && label.trim()) return label.trim().slice(0, 50);
+  return 'Action ' + w.id;
+}
+
+async function couchRunGameButton(id) {
+  if(couchGameButtonPending) return;
+  const button = couchGameButtons().find(w => w.id === id);
+  if(!button) return;
+  couchGameButtonPending = true;
+  batchStart();
+  try {
+    setDeltaCause(playerName + ' used a game button via Tablet-Hop');
+    await button.click();
+    couchActionMessage('Commande « ' + couchGameButtonLabel(button) + ' » exécutée.');
+  } catch(error) {
+    console.error('Tablet-Hop game button failed:', error);
+    couchActionMessage('Cette commande ne fonctionne pas ici. Essaie depuis le plateau.');
+  } finally {
+    batchEnd();
+    couchGameButtonPending = false;
+    couchScheduleHandRender();
+  }
+}
+
+function couchRenderGameButtons(stage) {
+  const section = stage.querySelector('#couch-hand-quick-panel');
+  if(!section) return;
+  const buttons = couchGameButtons();
+  section.hidden = buttons.length === 0;
+  if(!buttons.length) return;
+  const parent = section.querySelector('#couch-hand-quick-buttons');
+  const fragment = document.createDocumentFragment();
+  for(const w of buttons) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'couch-hand-game-button';
+    button.textContent = couchGameButtonLabel(w);
+    button.disabled = couchGameButtonPending;
+    button.addEventListener('click', () => couchRunGameButton(w.id));
+    fragment.appendChild(button);
+  }
+  parent.replaceChildren(fragment);
+}
+
+
 function couchScheduleHandRender() {
   if(couchMode !== 'phone' || couchHandRenderScheduled) return;
   couchHandRenderScheduled = true;
@@ -44,6 +107,7 @@ function couchRenderHand() {
   const play = stage.querySelector('#couch-hand-play');
   const feedback = stage.querySelector('#couch-hand-feedback');
 
+  couchRenderGameButtons(stage);
   const hasCards = cards.length > 0;
   empty.hidden = hasCards;
   content.hidden = !hasCards;
@@ -155,6 +219,10 @@ function couchInstallHand() {
           '<p id="couch-hand-feedback" class="couch-hand-feedback" role="status" aria-live="polite"></p>' +
         '</div>' +
       '</div>' +
+      '<section id="couch-hand-quick-panel" class="couch-hand-quick-panel" hidden>' +
+        '<h2>COMMANDES DU JEU</h2>' +
+        '<div id="couch-hand-quick-buttons" class="couch-hand-quick-buttons"></div>' +
+      '</section>' +
     '</div>';
 
   document.body.appendChild(stage);
