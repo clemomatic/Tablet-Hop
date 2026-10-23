@@ -1,3 +1,18 @@
+test.page('http://127.0.0.1:8272/')
+('home presents Tablet-Hop and lets users create or join rooms', async t => {
+  await t.resizeWindow(1200, 800);
+  await t.expect(Selector('title').innerText).contains('Tablet-Hop');
+  await t.expect(Selector('#create-room').exists).ok();
+  await t.click('#create-room');
+  await t.expect(Selector('#room-result').visible).ok();
+  await t.expect(Selector('#open-tv').getAttribute('href')).contains('couch=tv');
+  await t.expect(Selector('#open-phone').getAttribute('href')).contains('couch=phone');
+  await t.typeText('#room-input', 'friends-night', { replace: true });
+  await t.click('#join-form button[type="submit"]');
+  await t.expect(Selector('#room-code').innerText).eql('friends-night');
+  await t.expect(Selector('#open-classic').getAttribute('href')).eql('/friends-night');
+});
+
 import { Selector } from 'testcafe';
 
 fixture('Tablet-Hop Couch Mode smoke').page('http://127.0.0.1:8272/tablet-hop-smoke?couch=phone');
