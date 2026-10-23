@@ -1,7 +1,7 @@
 test.page('http://127.0.0.1:8272/')
 ('home presents Tablet-Hop and lets users create or join rooms', async t => {
   await t.resizeWindow(1200, 800);
-  await t.expect(Selector('title').innerText).contains('Tablet-Hop');
+  await t.expect(Selector('title').textContent).contains('Tablet-Hop');
   await t.expect(Selector('#create-room').exists).ok();
   await t.click('#create-room');
   await t.expect(Selector('#room-result').visible).ok();
