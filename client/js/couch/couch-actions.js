@@ -243,6 +243,7 @@ function couchInstallActions() {
   button.setAttribute('aria-pressed', 'false');
   button.textContent = '✦ Actions';
   button.addEventListener('click', () => {
+    couchHasChosenView = true;
     couchView = 'actions';
     couchUpdateUI();
     couchScheduleActionsRender();
