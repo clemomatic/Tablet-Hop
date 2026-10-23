@@ -1,0 +1,91 @@
+/* Tablet-Hop mobile action tray. Scoped to Couch Mode. */
+body[data-couch-mode="phone"] .couch-nav { grid-template-columns: repeat(3,minmax(0,1fr)); }
+body[data-couch-mode="phone"] .couch-nav button { font-size: 12px; }
+.couch-action-tray[hidden] { display: none !important; }
+body[data-couch-mode="phone"] .couch-action-tray {
+  overflow-y: auto;
+  max-height: min(62vh, 490px);
+  padding: 13px 0 10px;
+  border-top: 1px solid rgba(255,255,255,.10);
+  margin-top: 6px;
+}
+.couch-action-tray h3 { margin: 0; color: #fff2dd; font-size: 16px; font-weight: 800; }
+.couch-action-description { color: #bac8d4; font-size: 12px; margin: 3px 0 10px; }
+.couch-action-cards {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 5px 2px 9px;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+.couch-card-option {
+  flex: 0 0 84px;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+  border-radius: 11px;
+  padding: 8px 4px;
+  min-height: 124px;
+  cursor: pointer;
+  color: #e4e9ef;
+}
+.couch-card-option.selected {
+  border-color: #f0cf9b;
+  background: rgba(240,207,155,.18);
+  box-shadow: 0 0 0 1px rgba(240,207,155,.20);
+}
+.couch-card-thumbnail {
+  position: relative;
+  min-width: 34px;
+  min-height: 50px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #e9dfd0;
+  color: #233044;
+  pointer-events: none;
+}
+.couch-card-snapshot { display: block; position: relative; overflow: hidden; box-sizing: border-box; }
+.couch-card-caption {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+.couch-action-label { display: block; color: #c9d4dc; font-size: 11px; margin: 4px 0 5px; font-weight: 700; }
+.couch-action-row { display: flex; align-items: stretch; gap: 8px; }
+.couch-action-row select {
+  flex: 1 1 auto;
+  width: 40%;
+  min-height: 44px;
+  background: #28384b;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 10px;
+  color: white;
+  font-size: 12px;
+  padding: 0 6px;
+}
+.couch-action-row button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  color: #1c2836;
+  background: #f0cf9b;
+  font: 800 12px system-ui, sans-serif;
+  padding: 0 12px;
+  cursor: pointer;
+}
+.couch-action-row button:disabled { opacity: .48; cursor: not-allowed; }
+.couch-action-feedback { color: #f0cf9b; font-size: 11px; min-height: 15px; margin: 7px 0 0; }
