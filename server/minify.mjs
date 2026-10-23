@@ -122,7 +122,8 @@ const CLIENT_CSS = [
   'client/css/widgets/timer.css',
 
   'client/css/fonts.css',
-  'client/css/custom.css'
+  'client/css/custom.css',
+  'client/css/couch/couch-mode.css'
 ];
 
 const CLIENT_JS = [
@@ -171,7 +172,8 @@ const CLIENT_JS = [
   'client/js/widgets/spinner.js',
   'client/js/widgets/timer.js',
 
-  'client/js/main.js'
+  'client/js/main.js',
+  'client/js/couch/couch-mode.js'
 ];
 
 const EDITOR_CSS = [
