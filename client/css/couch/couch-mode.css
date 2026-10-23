@@ -1,0 +1,63 @@
+/* Tablet-Hop Couch Mode: scoped visual styles. */
+body[data-couch-mode] #toolbar, body[data-couch-mode] #showToolbarButton {
+  display: none !important;
+}
+body[data-couch-mode="tv"] #roomArea { pointer-events: none; }
+body[data-couch-mode="tv"] .widget.couch-private { display: none !important; }
+body[data-couch-mode] #couch-ui {
+  --gold: #f0cf9b;
+  color: #f9f4ea;
+  font-family: system-ui, sans-serif;
+  z-index: 999990;
+  position: fixed;
+  box-sizing: border-box;
+  background: rgba(18, 30, 42, .92);
+  border: 1px solid rgba(255, 255, 255, .15);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(20px);
+}
+body[data-couch-mode="tv"] #couch-ui {
+  top: max(16px, env(safe-area-inset-top));
+  right: 18px;
+  border-radius: 16px;
+  padding: 11px 15px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.couch-brand { font-size: 13px; letter-spacing: .12em; font-weight: 900; }
+.couch-brand span { color: var(--gold); }
+.couch-tv-tag { font-size: 10px; font-weight: 700; letter-spacing: .07em; color: #d4dce2; }
+body[data-couch-mode="phone"] #couch-ui {
+  inset: auto 0 0;
+  border-radius: 18px 18px 0 0;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+}
+.couch-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.couch-status { display: flex; flex-direction: column; text-align: right; gap: 2px; font-size: 14px; }
+.couch-status small { font-size: 11px; color: #b6c5d3; font-weight: 400; }
+.couch-message { margin: 6px 0; min-height: 13px; text-align: center; font-size: 11px; color: var(--gold); }
+.couch-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.couch-nav button {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 13px;
+  min-height: 50px;
+  color: #d7e2ec;
+  background: rgba(255,255,255,.08);
+  font: 700 14px system-ui, sans-serif;
+  cursor: pointer;
+}
+.couch-nav button.active {
+  color: #ffdfaf;
+  border-color: rgba(240,207,155,.65);
+  background: rgba(240,207,155,.16);
+}
+.couch-nav button:focus-visible { outline: 2px solid #ffdfaf; outline-offset: 2px; }
+@media (min-width: 720px) {
+  body[data-couch-mode="phone"] #couch-ui {
+    inset: auto auto 0 50%;
+    width: min(480px, 100vw);
+    transform: translateX(-50%);
+  }
+}
