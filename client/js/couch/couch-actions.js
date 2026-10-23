@@ -5,6 +5,7 @@ let couchSelectedCardID = null;
 let couchSelectedTargetID = '__table__';
 let couchActionPending = false;
 let couchActionsRenderQueued = false;
+let couchActionNotice = '';
 
 function couchHandCards() {
   const hand = couchMyHand();
@@ -78,6 +79,7 @@ function couchTargetLabel(target, index) {
 }
 
 function couchActionMessage(text) {
+  couchActionNotice = text;
   const el = document.getElementById('couch-action-message');
   if(el) el.textContent = text;
 }
@@ -124,6 +126,7 @@ function couchRenderActions() {
     label.textContent = couchCardTitle(card, index);
     button.appendChild(label);
     button.addEventListener('click', () => {
+      couchActionNotice = '';
       couchSelectedCardID = card.id;
       couchScheduleActionsRender();
     });
@@ -143,7 +146,7 @@ function couchRenderActions() {
   select.disabled = couchActionPending;
   play.disabled = couchActionPending;
   play.textContent = couchActionPending ? 'Déplacement…' : 'Poser la carte';
-  couchActionMessage(cards.length + (cards.length > 1 ? ' cartes disponibles' : ' carte disponible'));
+  couchActionMessage(couchActionNotice || (cards.length + (cards.length > 1 ? ' cartes disponibles' : ' carte disponible')));
 }
 
 function couchScheduleActionsRender() {
@@ -232,6 +235,7 @@ function couchInstallActions() {
     '<p class="couch-action-feedback" id="couch-action-message" role="status" aria-live="polite"></p>';
   nav.parentElement.insertBefore(tray, nav);
   tray.querySelector('#couch-action-target').addEventListener('change', event => {
+    couchActionNotice = '';
     couchSelectedTargetID = event.target.value;
   });
   tray.querySelector('#couch-action-play').addEventListener('click', couchPlaySelectedCard);
