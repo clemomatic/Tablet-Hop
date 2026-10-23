@@ -213,8 +213,11 @@ MinifyHTML().then(function(result) {
     process.exit();
   });
 
+  // Tablet-Hop: the home page introduces our TV, phone and classic room roles.
+  // Keep the original VirtualTabletop room handler for /:room and existing links.
   router.get('/', function(req, res) {
-    res.redirect(getEmptyRoomID());
+    res.setHeader('Cache-Control', 'no-store');
+    res.sendFile(path.resolve() + '/client/couch-home.html');
   });
 
   router.get('/dl/:room/:state/:variant', function(req, res, next) {
