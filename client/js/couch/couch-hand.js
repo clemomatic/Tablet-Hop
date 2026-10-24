@@ -84,6 +84,63 @@ function couchChooseCard(id, center = false) {
     });
 }
 
+
+function couchAvailableSeats() {
+  return widgetFilter(seat => seat.get('type') === 'seat' &&
+    (!seat.get('player') || seat.get('player') === playerName) &&
+    seat.get('display') !== false)
+    .sort((a,b) => Number(a.get('index') || 0) - Number(b.get('index') || 0));
+}
+
+async function couchTakeSeat(id) {
+  const seat = couchAvailableSeats().find(item => item.id === id);
+  if(!seat) {
+    couchActionMessage('Cette place est déjà occupée. Choisis-en une autre.');
+    couchScheduleHandRender();
+    return;
+  }
+  batchStart();
+  try {
+    setDeltaCause(playerName + ' joined a seat via Tablet-Hop');
+    await seat.set('player', playerName);
+    await seat.set('color', playerColor);
+    couchActionMessage('Ta place est réservée. Bonne partie !');
+  } catch(error) {
+    console.error('Tablet-Hop seat selection failed:', error);
+    couchActionMessage('Impossible de rejoindre cette place. Réessaie sur le plateau.');
+  } finally {
+    batchEnd();
+    couchScheduleHandRender();
+  }
+}
+
+function couchRenderSeatPicker(stage) {
+  const picker = stage.querySelector('#couch-seat-picker');
+  if(!picker) return;
+  const hasSeat = !!couchMyHand();
+  const hasCards = couchHandCards().length > 0;
+  picker.hidden = hasSeat || hasCards;
+  if(picker.hidden) return;
+
+  const seats = couchAvailableSeats();
+  const list = picker.querySelector('#couch-seat-choices');
+  const fragment = document.createDocumentFragment();
+  seats.forEach((seat, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'couch-seat-choice';
+    const label = seat.get('label') || seat.get('name') || seat.get('text') ||
+      'Place ' + (Number(seat.get('index')) || index + 1);
+    button.textContent = String(label).slice(0, 45);
+    button.addEventListener('click', () => couchTakeSeat(seat.id));
+    fragment.appendChild(button);
+  });
+  list.replaceChildren(fragment);
+  picker.querySelector('#couch-seat-prompt').textContent = seats.length
+    ? 'Choisis ta place pour recevoir tes cartes.'
+    : 'Aucune place libre détectée. Tu peux passer au plateau pour rejoindre une partie ou charger un jeu.';
+}
+
 function couchRenderHand() {
   couchHandRenderScheduled = false;
   if(couchMode !== 'phone') return;
@@ -108,6 +165,7 @@ function couchRenderHand() {
   const feedback = stage.querySelector('#couch-hand-feedback');
 
   couchRenderGameButtons(stage);
+  couchRenderSeatPicker(stage);
   const hasCards = cards.length > 0;
   empty.hidden = hasCards;
   content.hidden = !hasCards;
@@ -120,7 +178,7 @@ function couchRenderHand() {
     const message = empty.querySelector('p');
     message.textContent = ownedHand
       ? 'Les cartes que vous recevrez apparaîtront ici automatiquement.'
-      : 'Rejoignez une place dans le jeu pour retrouver vos cartes.';
+      : 'Une fois ta place sélectionnée, les cartes reçues apparaîtront ici.';
     rail.replaceChildren();
     return;
   }
@@ -196,6 +254,10 @@ function couchInstallHand() {
         '<h1 id="couch-hand-headline">Vos cartes, à portée de main.</h1>' +
         '<p id="couch-hand-count" aria-live="polite">Connexion à la partie…</p>' +
       '</div>' +
+      '<section class="couch-seat-picker" id="couch-seat-picker" hidden>' +
+        '<p id="couch-seat-prompt">Choisis ta place pour recevoir tes cartes.</p>' +
+        '<div id="couch-seat-choices" class="couch-seat-choices"></div>' +
+      '</section>' +
       '<div class="couch-hand-empty" id="couch-hand-empty" hidden>' +
         '<div class="couch-hand-empty-glyph" aria-hidden="true">♠</div>' +
         '<p>Choisissez votre place sur le plateau pour retrouver vos cartes.</p>' +
