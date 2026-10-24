@@ -48,3 +48,42 @@ test('seat opens personal hand, shows actual cards and plays a card to the board
   // The board remains the single source of truth for its position/ownership.
   await t.expect(Selector('#couch-hand-stage').visible).ok();
 });
+
+
+test.page('http://127.0.0.1:8272/couch-seat-ci?couch=phone')
+('phone shows personal interface and offers available seats before cards exist', async t => {
+  await t.resizeWindow(390, 844);
+  await t.expect(Selector('#couch-hand-stage').visible).ok({timeout:15000});
+  const state = {
+    hand: {id:'hand',type:'holder',x:100,y:390,width:530,height:170,childrenPerOwner:true,dropTarget:[{type:'card'}]},
+    seat1: {id:'seat1',type:'seat',index:1,hand:'hand',x:100,y:45,player:''},
+    seat2: {id:'seat2',type:'seat',index:2,hand:'hand',x:220,y:45,player:''}
+  };
+  const response = await fetch('http://127.0.0.1:8272/state/couch-seat-ci', {
+    method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)
+  });
+  await t.expect(response.ok).ok();
+  await t.expect(Selector('#couch-seat-choices .couch-seat-choice').count).eql(2, {timeout:15000});
+  await t.click(Selector('#couch-seat-choices .couch-seat-choice').nth(0));
+  await t.expect(Selector('#couch-seat-picker').visible).notOk({timeout:15000});
+  await t.expect(Selector('#couch-hand-count').innerText).contains('Aucune carte');
+  await t.expect(Selector('#couch-hand-stage').visible).ok();
+});
+
+test.page('http://127.0.0.1:8272/couch-tv-ci?couch=tv')
+('TV masks personally owned cards even when the game has no Seat.hand', async t => {
+  await t.resizeWindow(1360, 768);
+  await t.expect(Selector('body').getAttribute('data-couch-mode')).eql('tv');
+  const state = {
+    deck:{id:'deck',type:'deck',x:20,y:20,cardTypes:{a:{}},faceTemplates:[{objects:[]}]},
+    personal:{id:'personal',type:'card',deck:'deck',cardType:'a',owner:'OtherPlayer',x:300,y:200},
+    public:{id:'public',type:'card',deck:'deck',cardType:'a',owner:null,x:500,y:200}
+  };
+  const response = await fetch('http://127.0.0.1:8272/state/couch-tv-ci', {
+    method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)
+  });
+  await t.expect(response.ok).ok();
+  await t.expect(Selector('#w_personal').hasClass('couch-private')).ok({timeout:15000});
+  await t.expect(Selector('#w_personal').visible).notOk();
+  await t.expect(Selector('#w_public').hasClass('couch-private')).notOk();
+});
