@@ -22,7 +22,13 @@ function couchCountCards(hand) {
 }
 
 function couchMaskTVHands() {
-  const hands = new Set(widgetFilter(w => w.get('type') === 'seat').map(w => w.get('hand')).filter(Boolean));
+  const hands = new Set(widgetFilter(w => w.get('type') === 'seat')
+    .map(w => w.get('hand')).filter(Boolean));
+  // In older games a hand holder may not be linked to a seat at all.
+  // A holder that arranges cards per owner is private to the players.
+  for(const holder of widgetFilter(w => w.get('type') === 'holder' &&
+    (w.get('childrenPerOwner') === true || !!w.get('showInactiveFaceToSeat'))))
+    hands.add(holder.id);
   for(const w of widgetFilter(() => true)) {
     // Do not leak personal cards on the shared TV even when a game does not
     // put them inside a Seat.hand holder (many older games do not).
