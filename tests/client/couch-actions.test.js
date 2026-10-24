@@ -66,6 +66,12 @@ describe('Tablet-Hop mobile card actions',()=>{
     expect(fixture.actions.handCards().map(w=>w.id)).toEqual(['alice-card']);
   });
 
+  test('recognizes directly-owned cards even when the game defines no seat hand',()=>{
+    const fixture=setup();
+    fixture.context.couchMyHand=()=>null;
+    expect(fixture.actions.handCards().map(w=>w.id)).toEqual(['alice-card']);
+  });
+
   test('does not suggest private hands or seat-restricted zones as destinations',()=>{
     const fixture=setup();
     expect(fixture.actions.targets(fixture.a).map(w=>w.id)).toEqual(['public-play']);
