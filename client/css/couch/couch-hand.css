@@ -287,3 +287,46 @@ body[data-couch-mode="phone"] .couch-hand-game-button {
 }
 body[data-couch-mode="phone"] .couch-hand-game-button:active {background:rgba(241,204,148,.23);}
 body[data-couch-mode="phone"] .couch-hand-game-button:disabled {opacity:.5;cursor:default;}
+
+
+/* Join a seat directly from the dedicated phone screen — no miniature board required. */
+body[data-couch-mode="phone"] .couch-seat-picker[hidden]{display:none!important;}
+body[data-couch-mode="phone"] .couch-seat-picker{
+  margin:8px 21px 8px;
+  padding:18px 16px 17px;
+  background:linear-gradient(140deg,rgba(52,83,86,.58),rgba(24,42,54,.88));
+  border:1px solid rgba(241,204,148,.34);
+  border-radius:19px;
+  box-shadow:0 15px 40px rgba(0,0,0,.17);
+}
+body[data-couch-mode="phone"] .couch-seat-picker p{
+  color:#f1dbb9;
+  font-size:14px;
+  font-weight:740;
+  line-height:1.48;
+  margin:0 0 15px;
+}
+body[data-couch-mode="phone"] .couch-seat-choices{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+body[data-couch-mode="phone"] .couch-seat-choice{
+  border:1px solid rgba(241,204,148,.42);
+  border-radius:13px;
+  padding:12px 11px;
+  color:#f7eedc;
+  background:rgba(255,255,255,.095);
+  min-height:51px;
+  font:750 13px system-ui,sans-serif;
+  cursor:pointer;
+  overflow-wrap:anywhere;
+  transition:background .16s,border-color .16s;
+}
+body[data-couch-mode="phone"] .couch-seat-choice:active{
+  background:rgba(241,204,148,.22);
+  border-color:rgba(241,204,148,.95);
+}
+body[data-couch-mode="phone"] .couch-seat-choice:focus-visible{
+  outline:2px solid #f0cf9b;outline-offset:3px;
+}
