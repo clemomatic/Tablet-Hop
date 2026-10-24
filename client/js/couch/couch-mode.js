@@ -1,9 +1,9 @@
 // Tablet-Hop Couch Mode: optional TV / phone views over the original VTT engine.
 const couchMode = new URLSearchParams(location.search).get('couch');
 const couchEnabled = couchMode === 'tv' || couchMode === 'phone';
-let couchView = 'board';
+let couchView = couchMode === 'phone' ? 'hand' : 'board';
 let couchRefreshQueued = false;
-let couchHasChosenView = false;
+let couchHasChosenView = couchMode === 'phone';
 
 function couchMyHand() {
   for(const seat of widgetFilter(w => w.get('type') === 'seat' && w.get('player') === playerName)) {
@@ -24,7 +24,14 @@ function couchCountCards(hand) {
 function couchMaskTVHands() {
   const hands = new Set(widgetFilter(w => w.get('type') === 'seat').map(w => w.get('hand')).filter(Boolean));
   for(const w of widgetFilter(() => true)) {
-    let privateWidget = hands.has(w.id) || !!w.get('onlyVisibleForSeat') || !!w.get('linkedToSeat');
+    // Do not leak personal cards on the shared TV even when a game does not
+    // put them inside a Seat.hand holder (many older games do not).
+    const owner = w.get('owner');
+    const ownedCard = w.get('type') === 'card' &&
+      owner !== null && owner !== undefined && owner !== '' &&
+      (!Array.isArray(owner) || owner.length > 0);
+    let privateWidget = ownedCard || hands.has(w.id) ||
+      !!w.get('onlyVisibleForSeat') || !!w.get('linkedToSeat');
     let ancestor = w.get('parent');
     const seen = new Set();
     while(!privateWidget && ancestor && widgets.has(ancestor) && !seen.has(ancestor)) {
@@ -41,8 +48,11 @@ function couchUpdateUI() {
   const hand = couchMyHand();
   const title = document.getElementById('couch-hand-title');
   const status = document.getElementById('couch-hand-status');
-  if(title) title.textContent = hand ? 'Ma main' : 'Aucune place sélectionnée';
-  if(status) status.textContent = hand ? couchHandCards().length + ' cartes' : 'Choisis une place sur le plateau';
+  const cards = couchHandCards();
+  if(title) title.textContent = 'Ma main';
+  if(status) status.textContent = cards.length
+    ? cards.length + (cards.length > 1 ? ' cartes' : ' carte')
+    : hand ? 'En attente de cartes' : 'Choisis ta place';
   if(typeof couchScheduleHandRender === 'function') couchScheduleHandRender();
   for(const button of document.querySelectorAll('[data-couch-view]')) {
     const active = button.dataset.couchView === couchView;
@@ -60,13 +70,6 @@ function couchShowBoard() {
 }
 
 function couchShowHand() {
-  const hand = couchMyHand();
-  if(!hand) {
-    const message = document.getElementById('couch-message');
-    if(message) message.textContent = 'Choisis une place pour voir ta main.';
-    couchShowBoard();
-    return;
-  }
   couchHasChosenView = true;
   couchView = 'hand';
   // The new hand screen displays replicas of rendered faces, not a zoomed board.
@@ -80,8 +83,6 @@ function couchRefresh() {
   couchRefreshQueued = false;
   if(couchMode === 'tv') couchMaskTVHands();
   if(couchMode === 'phone') {
-    // After the player occupies a seat, open their hand automatically once.
-    if(!couchHasChosenView && couchMyHand()) couchShowHand();
     couchUpdateUI();
     couchScheduleHandRender();
   }
@@ -110,10 +111,10 @@ function couchInstall() {
     bar.innerHTML =
       '<header class="couch-header"><strong class="couch-brand">TABLET<span>HOP</span></strong>' +
       '<div class="couch-status"><b id="couch-hand-title">Ma main</b><small id="couch-hand-status">Connexion…</small></div></header>' +
-      '<p class="couch-message" id="couch-message" role="status">Choisis une place puis touche « Ma main ».</p>' +
+      '<p class="couch-message" id="couch-message" role="status">Plateau partagé · Main privée sur téléphone</p>' +
       '<nav class="couch-nav" aria-label="Vue de jeu">' +
-      '<button type="button" data-couch-view="hand" aria-pressed="false">🃏 Ma main</button>' +
-      '<button type="button" data-couch-view="board" aria-pressed="true">▦ Plateau</button></nav>';
+      '<button type="button" data-couch-view="hand" aria-pressed="true">🃏 Ma main</button>' +
+      '<button type="button" data-couch-view="board" aria-pressed="false">▦ Plateau</button></nav>';
     bar.querySelector('[data-couch-view="hand"]').addEventListener('click', couchShowHand);
     bar.querySelector('[data-couch-view="board"]').addEventListener('click', couchShowBoard);
   }
