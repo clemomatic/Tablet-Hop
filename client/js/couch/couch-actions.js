@@ -9,14 +9,19 @@ let couchActionNotice = '';
 
 function couchHandCards() {
   const hand = couchMyHand();
-  if(!hand) return [];
   return widgetFilter(card => {
     if(card.get('type') !== 'card') return false;
     const owner = card.get('owner');
     if(card.domElement && card.domElement.classList.contains('foreign')) return false;
     if(owner && owner !== playerName && !(Array.isArray(owner) && owner.includes(playerName)))
       return false;
-    return card.get('parent') === hand.id || card.isDescendantOf(hand);
+    const isInMySeat = !!hand &&
+      (card.get('parent') === hand.id || card.isDescendantOf(hand));
+    const isOwnedByMe = owner === playerName ||
+      (Array.isArray(owner) && owner.includes(playerName));
+    // Some VirtualTabletop games assign cards directly to players, without a Seat.hand.
+    // Unowned cards never appear in this fallback: they could belong to the public table.
+    return isInMySeat || isOwnedByMe;
   }).sort((a, b) => {
     const dx = Number(a.get('x') || 0) - Number(b.get('x') || 0);
     const dy = Number(a.get('y') || 0) - Number(b.get('y') || 0);
@@ -122,8 +127,8 @@ function couchRenderActions() {
     select.replaceChildren(new Option('Aucune carte disponible', ''));
     play.disabled = true;
     couchActionMessage(couchMyHand()
-      ? 'Ta main ne contient pas de carte déplaçable.'
-      : 'Commence par choisir une place sur le plateau.');
+      ? 'Aucune carte dans ta main pour le moment.'
+      : 'Rejoins une place pour afficher tes cartes.');
     return;
   }
 
